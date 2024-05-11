@@ -6,7 +6,8 @@
 const int height = 600;
 const int width = 800;
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height); //func for resize window
+void processInput(GLFWwindow* window);
 
 int main()
 {
@@ -17,7 +18,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "EruEngine", NULL, NULL); //GLFW window
+    GLFWwindow* window = glfwCreateWindow(width, height, "EruEngine", nullptr, nullptr); //GLFW window
     if (window == NULL) {
         std::cout << "Failed to create GLFW window";
         glfwTerminate();
@@ -33,7 +34,12 @@ int main()
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // glViewport func with resize
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window)) { //Rendering
+        processInput(window); // Key Input
+
+        glClearColor(0.4f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -42,6 +48,13 @@ int main()
 
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+void processInput(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) 
+{
     glViewport(0, 0, width, height);
 }
