@@ -3,8 +3,20 @@
 
 #include <iostream>
 
-const int height = 600;
-const int width = 800;
+GLfloat point[]{
+     0.0f,  0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+    -0.5f, -0.5f, 0.0f
+};
+
+GLfloat colors[]{
+     1.0f, 0.0f, 0.0f,
+     0.0f, 1.0f, 0.0f,
+     0.0f, 0.0f, 1.0f
+};
+
+const int windowSizeY = 600;
+const int windowSizeX = 800;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); //func for resize window
 void processInput(GLFWwindow* window);
@@ -18,7 +30,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "EruEngine", nullptr, nullptr); //GLFW window
+    GLFWwindow* window = glfwCreateWindow(windowSizeX, windowSizeY, "EruEngine", nullptr, nullptr); //GLFW window
     if (window == NULL) {
         std::cout << "Failed to create GLFW window";
         glfwTerminate();
