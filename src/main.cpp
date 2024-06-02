@@ -15,6 +15,24 @@ GLfloat colors[]{
      0.0f, 0.0f, 1.0f
 };
 
+const char* vertex_shader =
+"#version 460 core\n"
+"layout(location = 0) in vec3 vertex_position;"
+"layout(location = 1) in vec3 vertex_color;"
+"out vec3 color;"
+"void main() {"
+"   color = vertex_color;"
+"   gl_position = vec4(vertex_position, 1.0);"
+"}";
+
+const char* fragment_shader =
+"#version460 core\n"
+"in vec3 color;"
+"out vec4 frag_color;"
+"void main() {"
+"   frag_color = vec4(color, 1.0);"
+"}";
+
 const int windowSizeY = 600;
 const int windowSizeX = 800;
 
