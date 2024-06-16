@@ -61,6 +61,22 @@ int main()
         std::cout << "Failed to initialize GLAD";
         return -1;
     }
+    
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(point), point, GL_STATIC_DRAW);
+
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertex_shader, NULL);
+    glCompileShader(vertexShader);
+    int success;
+    char infolog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+
+    if (!success) {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infolog);
+        std::cout << "Error::Shader:Vertex:compilation_failed\n" << infolog<<std::endl;
+    }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // glViewport func with resize
 
