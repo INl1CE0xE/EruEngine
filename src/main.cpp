@@ -63,6 +63,8 @@ int main()
         std::cout << "Failed to initialize GLAD";
         return -1;
     }
+    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
     int success; // лог дл€ проверки шейдеров на компил€цию
     char infolog[512];
