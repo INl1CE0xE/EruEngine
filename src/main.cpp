@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include "Renderer/shader.h"
 
 GLfloat point[]{
      0.0f,  0.5f, 0.0f,
@@ -14,24 +15,6 @@ GLfloat colors[]{
      0.0f, 1.0f, 0.0f,
      0.0f, 0.0f, 1.0f
 };
-
-const char* vertex_shader =
-"#version 460 core\n"
-"layout(location = 0) in vec3 vertex_position;"
-"layout(location = 1) in vec3 vertex_color;"
-"out vec3 color;"
-"void main() {"
-"   color = vertex_color;"
-"   gl_Position = vec4(vertex_position, 1.0);"
-"}";
-
-const char* fragment_shader =
-"#version 460 core\n"
-"in vec3 color;"
-"out vec4 frag_color;"
-"void main() {"
-"   frag_color = vec4(color, 1.0);"
-"}";
 
 const int windowSizeY = 600;
 const int windowSizeX = 800;
@@ -58,7 +41,6 @@ int main()
 
     glfwMakeContextCurrent(window);
 
-
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) { //GLAD initialization 
         std::cout << "Failed to initialize GLAD";
         return -1;
@@ -66,39 +48,7 @@ int main()
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-    int success; // лог для проверки шейдеров на компиляцию
-    char infolog[512];
-
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER); // Вертекс шейдер
-    glShaderSource(vertexShader, 1, &vertex_shader, NULL);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infolog);
-        std::cout << "Error::Shader:Vertex:compilation_failed\n" << infolog<<std::endl;
-    }
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER); // Фрагментный шейдер
-    glShaderSource(fragmentShader, 1, &fragment_shader, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infolog);
-        std::cout << "Error::Shader:Fragment:compilation_failed\n" << infolog << std::endl;
-    }
-
-    GLuint shaderProgram = glCreateProgram(); // Линкование шейдеров в одну шейдерную программу
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    
         //Тут используются два VBO для точек и для цвета, чтобы от точек переливался цвет на треугольнике
-
     GLuint VBO_points = 0;
     glGenBuffers(1, &VBO_points); // Генерация буфера точек
     glBindBuffer(GL_ARRAY_BUFFER, VBO_points); // Привязка буфера точек к функции массива точек
@@ -123,14 +73,17 @@ int main()
 
    
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // glViewport func with resize
-
+    Shader shader("F:/EruEngine/src/Renderer/vshader.vs","F:/EruEngine/src/Renderer/fshader.fs");
+    float timevalue;
     while (!glfwWindowShouldClose(window)) { //Rendering
         processInput(window); // Key Input
 
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        shader.use();
+        timevalue = glfwGetTime();
+        shader.setfloat("xset", timevalue); // Чтобы смещать фигуру по оси x 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
