@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 
-
 struct Shader {
 	
 	unsigned int Shader::ID ;
