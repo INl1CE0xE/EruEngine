@@ -7,6 +7,8 @@ project(${PROJECT_NAME})
 add_executable(${PROJECT_NAME} 
 src/main.cpp
 src/Renderer/shader.h
+src/Renderer/external/stb_image.h
+src/Renderer/external/stb_image.cpp
 )
 
 

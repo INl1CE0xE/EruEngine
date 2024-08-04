@@ -1,20 +1,26 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "Renderer/external/stb_image.h" // external lib
 
 #include <iostream>
 #include "Renderer/shader.h"
 
-GLfloat point[]{
-     0.0f,  0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-    -0.5f, -0.5f, 0.0f
+GLfloat vertices[]{
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f
+};
+GLint indices[]{
+     0, 1, 3, // первый треугольник
+     1, 2, 3  // второй треугольник
 };
 
-GLfloat colors[]{
-     1.0f, 0.0f, 0.0f,
-     0.0f, 1.0f, 0.0f,
-     0.0f, 0.0f, 1.0f
-};
+//GLfloat colors[]{
+//     1.0f, 0.0f, 0.0f,
+//     0.0f, 1.0f, 0.0f,
+//     0.0f, 0.0f, 1.0f
+//};
 
 const int windowSizeY = 600;
 const int windowSizeX = 800;
@@ -48,44 +54,74 @@ int main()
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-        //Тут используются два VBO для точек и для цвета, чтобы от точек переливался цвет на треугольнике
-    GLuint VBO_points = 0;
-    glGenBuffers(1, &VBO_points); // Генерация буфера точек
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_points); // Привязка буфера точек к функции массива точек
-    glBufferData(GL_ARRAY_BUFFER, sizeof(point), point, GL_STATIC_DRAW);
-    
-    GLuint VBO_colors = 0;
-    glGenBuffers(1, &VBO_colors);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_colors);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+    //texture
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("F:/EruEngine/src/Resource/wooden_container.jpg", &width, &height, &nrChannels, 0);
 
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // установка метода наложения текстуры GL_REPEAT (стандартный метод наложения)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // Установка параметров фильтрации текстуры
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+    //end texture
+
+        //Тут используются два VBO для точек и для цвета, чтобы от точек переливался цвет на треугольнике
     GLuint VAO = 0;
+    GLuint VBO = 0;
+    GLuint EBO = 0;
+
     glGenVertexArrays(1, &VAO); // Генерация массива для буферов
-    glBindVertexArray(VAO); // Работа с VAO
+    glGenBuffers(1, &VBO); // Генерация буфера точек
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO); // Связывание массива объектов
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO); // Привязка буфера точек к функции массива точек
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_points);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr); // 0
+    
     glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_colors);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-   
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // glViewport func with resize
     Shader shader("F:/EruEngine/src/Renderer/vshader.vs","F:/EruEngine/src/Renderer/fshader.fs");
     float timevalue;
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // это полигон мод, нужно раскомментировать 
     while (!glfwWindowShouldClose(window)) { //Rendering
         processInput(window); // Key Input
 
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glBindTexture(GL_TEXTURE_2D, texture);
+
         shader.use();
         timevalue = glfwGetTime();
-        shader.setfloat("xset", timevalue); // Чтобы смещать фигуру по оси x 
+        //shader.setfloat("xset", timevalue); // Чтобы смещать фигуру по оси x 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
