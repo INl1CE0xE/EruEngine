@@ -2,6 +2,10 @@
 #include <GLFW/glfw3.h>
 #include "Renderer/external/stb_image.h" // external lib
 
+#include "external/glm/glm.hpp" //glm GL Math
+#include "external/glm/gtc/matrix_transform.hpp"
+#include "external/glm/gtc/type_ptr.hpp"
+
 #include <iostream>
 #include "Renderer/shader.h"
 
@@ -107,9 +111,9 @@ int main()
     //end texture
  
         //Тут используются два VBO для точек и для цвета, чтобы от точек переливался цвет на треугольнике
-    GLuint VAO = 0;
-    GLuint VBO = 0;
-    GLuint EBO = 0;
+    GLuint VAO = 0; // Vertex Array Object
+    GLuint VBO = 0; // Vertex Buffer Object
+    GLuint EBO = 0; // Elements Buffer Object
 
     glGenVertexArrays(1, &VAO); // Генерация массива для буферов
     glGenBuffers(1, &VBO); // Генерация буфера точек
@@ -141,6 +145,11 @@ int main()
     glUniform1i(glGetUniformLocation(shader.ID, "texture1"), 0);
     glUniform1i(glGetUniformLocation(shader.ID, "texture2"), 1);
 
+    glm::mat4 trans = glm::mat4(1.0f);
+    //trans = glm::translate(trans, glm::vec3(0.3f, 0.3f, 0.0f)); // Это для перестановки (перемещения)
+    //trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 0.0f)); // Это для поворота вокруг заданной оси
+    trans = glm::scale(trans, glm::vec3(0.4, 0.4, 1.0)); // Это уменьшает или увеличивает
+
     while (!glfwWindowShouldClose(window)) { //Rendering
         processInput(window); // Key Input
 
@@ -153,14 +162,18 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
 
         //glUniform1f(glGetUniformLocation(shader.ID, "mixValue"), mixValue);
-        shader.setfloat("mixValue", mixValue);
-        shader.setfloat("xset", obj_pos);
-
+        shader.setfloat("mixValue", mixValue); // для рисования 2 текстуры
+        //shader.setfloat("xset", obj_pos);
+        trans = glm::rotate(trans, obj_pos, glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::translate(trans, glm::vec3(mixValue, 0.0f, 0.0f));
+        shader.setmat4("transform", trans);
+        
         shader.use();
         timevalue = glfwGetTime();
         //shader.setfloat("xset", timevalue); // Чтобы смещать фигуру по оси x 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -174,19 +187,19 @@ void processInput(GLFWwindow* window) {
         glfwSetWindowShouldClose(window, true);
     }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        mixValue += 0.01f;
+        mixValue += 0.001f;
         if (mixValue > 1.0f) mixValue = 1.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        mixValue -= 0.01f;
-        if (mixValue < 0.0f) mixValue = 0.0f;
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        obj_pos += 0.01f;
-        if (obj_pos > 1.0f) obj_pos = 1.0f;
+        mixValue -= 0.001f;
+        if (mixValue < -1.0f) mixValue = -1.0f;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        obj_pos -= 0.01f;
+        obj_pos += 0.001f;
+        if (obj_pos > 1.0f) obj_pos = 1.0f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        obj_pos -= 0.001f;
         if (obj_pos < -1.0f) obj_pos = -1.0f;
     }
 }

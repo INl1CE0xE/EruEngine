@@ -5,8 +5,9 @@ layout(location = 2) in vec2 v_tex;
 out vec3 color;
 out vec2 tex_coord;
 uniform float xset;
+uniform mat4 transform;
 void main() {
    color = vertex_color;
-   gl_Position = vec4(v_pos.x + xset, v_pos.y, v_pos.z , 1.0);
+   gl_Position = transform * vec4(v_pos.x + xset, v_pos.y, v_pos.z , 1.0);
    tex_coord = v_tex;
 }

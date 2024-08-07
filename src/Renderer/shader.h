@@ -6,6 +6,10 @@
 #include <string>
 #include <sstream>
 
+#include "external/glm/glm.hpp" //glm GL Math
+#include "external/glm/gtc/matrix_transform.hpp"
+#include "external/glm/gtc/type_ptr.hpp"
+
 struct Shader {
 	
 	unsigned int Shader::ID ;
@@ -68,8 +72,13 @@ struct Shader {
 	};
 
 	void setfloat(const std::string &name, float value) {
-		int uformlocation = glGetUniformLocation(ID, name.c_str());
+		unsigned int uformlocation = glGetUniformLocation(ID, name.c_str());
 		glUniform1f(uformlocation, value);
+	}
+
+	void setmat4(const std::string& name, glm::mat4 trans) {
+		unsigned int transformLoc = glGetUniformLocation(ID, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 	}
 
 private:

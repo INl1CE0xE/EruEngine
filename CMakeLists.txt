@@ -9,6 +9,9 @@ src/main.cpp
 src/Renderer/shader.h
 src/Renderer/external/stb_image.h
 src/Renderer/external/stb_image.cpp
+src/external/glm/glm.hpp
+src/external/glm/gtc/matrix_transform.hpp
+src/external/glm/gtc/type_ptr.hpp
 )
 
 
