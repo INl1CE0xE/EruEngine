@@ -4,10 +4,13 @@ layout(location = 1) in vec3 vertex_color;
 layout(location = 2) in vec2 v_tex;
 out vec3 color;
 out vec2 tex_coord;
-uniform float xset;
-uniform mat4 transform;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 void main() {
    color = vertex_color;
-   gl_Position = transform * vec4(v_pos.x + xset, v_pos.y, v_pos.z , 1.0);
+   gl_Position = projection * view * model * vec4(v_pos, 1.0);
    tex_coord = v_tex;
 }

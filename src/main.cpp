@@ -12,14 +12,54 @@
 
 GLfloat vertices[]{
     // точки               цвета              позиция текстуры
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,  // 1
      0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+
+     0.5f,  0.5f, -1.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // 2
+     0.5f, -0.5f, -1.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+     0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+
+     0.5f,  0.5f, -1.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // 3
+     0.5f, 0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+     -0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+     -0.5f,  0.5f, -1.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+
+     0.5f,  0.5f, -1.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,  // 4
+     0.5f, -0.5f, -1.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+    -0.5f, -0.5f, -1.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -1.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+
+     -0.5f,  0.5f, -1.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // 5
+     -0.5f, -0.5f, -1.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+     -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+
+     0.5f,  -0.5f, -1.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // 6
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+     -0.5f,  -0.5f, -1.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f,
 };
 GLint indices[]{
      0, 1, 3, // первый треугольник
-     1, 2, 3  // второй треугольник
+     1, 2, 3, // второй треугольник
+
+     4, 5, 7, // первый треугольник
+     5, 6, 7,  // второй треугольник
+
+     8, 9, 11, // первый треугольник
+     9, 10, 11,  // второй треугольник
+
+     12, 13, 15, // первый треугольник
+     13, 14, 15, // второй треугольник
+
+     16, 17, 19, // первый треугольник
+     17, 18, 19,  // второй треугольник
+
+     20, 21, 23, // первый треугольник
+     21, 22, 23  // второй треугольник
 };
 
 //GLfloat colors[]{
@@ -63,9 +103,8 @@ int main()
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-    Texture 
-        texture1("F:/EruEngine/src/Resource/wooden_container.jpg", GL_REPEAT, GL_LINEAR, GL_RGB), 
-        texture2("F:/EruEngine/src/Resource/awesomeface.png", GL_REPEAT, GL_LINEAR, GL_RGBA);
+    Texture
+        texture1("F:/EruEngine/src/Resource/anime_g.png", GL_REPEAT, GL_LINEAR, GL_RGBA, GL_RGBA);
  
         //Тут используются два VBO для точек и для цвета, чтобы от точек переливался цвет на треугольнике
     GLuint VAO = 0; // Vertex Array Object
@@ -96,42 +135,59 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // glViewport func with resize
     Shader shader("F:/EruEngine/src/Renderer/vshader.vs","F:/EruEngine/src/Renderer/fshader.fs");
     float timevalue;
+   
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // это полигон мод, нужно раскомментировать 
    
     shader.use();
     glUniform1i(glGetUniformLocation(shader.ID, "texture1"), 0);
     glUniform1i(glGetUniformLocation(shader.ID, "texture2"), 1);
-
+    
+    
+    //GLM transform start 
+    
     glm::mat4 trans = glm::mat4(1.0f);
     //trans = glm::translate(trans, glm::vec3(0.3f, 0.3f, 0.0f)); // Это для перестановки (перемещения)
     //trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 0.0f)); // Это для поворота вокруг заданной оси
-    trans = glm::scale(trans, glm::vec3(0.4, 0.4, 1.0)); // Это уменьшает или увеличивает
+    //trans = glm::scale(trans, glm::vec3(0.4, 0.4, 1.0)); // Это уменьшает или увеличивает
+    
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
 
+    //model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(-0.5f, 0.5f, 0.0f));
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    projection = glm::perspective(glm::radians(45.0f), float(windowSizeX / windowSizeY), 0.1f, 100.0f);
+
+    shader.setmat4("model", model); 
+    shader.setmat4("view", view);
+    shader.setmat4("projection", projection);
+
+    //GLM end
+
+    glEnable(GL_DEPTH_TEST); // Z buffer
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // это для прозрачности png
+    
     while (!glfwWindowShouldClose(window)) { //Rendering
         processInput(window); // Key Input
 
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // add for z buffer
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1.texture);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2.texture);
+       
 
         //glUniform1f(glGetUniformLocation(shader.ID, "mixValue"), mixValue);
-        shader.setfloat("mixValue", mixValue); // для рисования 2 текстуры
-        //shader.setfloat("xset", obj_pos);
-        trans = glm::rotate(trans, obj_pos, glm::vec3(0.0f, 0.0f, 1.0f));
-        trans = glm::translate(trans, glm::vec3(mixValue, 0.0f, 0.0f));
-        shader.setmat4("transform", trans);
-        
+        shader.setfloat("mixValue", 0.5f); // для рисования 2 текстур
+        model = glm::rotate(model, 0.01f * glm::radians(50.0f), glm::vec3(0.5f, 0.5f, 0.0f));
+        shader.setmat4("model", model);
         shader.use();
-        timevalue = glfwGetTime();
-        //shader.setfloat("xset", timevalue); // Чтобы смещать фигуру по оси x 
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        
 
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
